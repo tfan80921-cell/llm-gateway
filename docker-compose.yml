@@ -1,0 +1,27 @@
+# LiteLLM — entorno LOCAL
+# Puerto 4000 para no chocar con Cotorr (:3000) ni New API legacy.
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: llm-gateway-local
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    volumes:
+      - ./config/local.yaml:/app/config.yaml:ro
+    command: ["--config", "/app/config.yaml", "--port", "4000", "--host", "0.0.0.0"]
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

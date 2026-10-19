@@ -1,0 +1,32 @@
+# Entorno: réplica (GCP o Oracle Cloud)
+# Objetivo: misma API lógica (chat-free) si el primario AWS no responde.
+# Idealmente mismos modelos; keys pueden ser del mismo proveedor u otras cuentas.
+
+model_list:
+  - model_name: chat-free
+    litellm_params:
+      model: groq/llama-3.3-70b-versatile
+      api_key: os.environ/GROQ_API_KEY
+      order: 1
+  - model_name: chat-free
+    litellm_params:
+      model: gemini/gemini-2.0-flash
+      api_key: os.environ/GEMINI_API_KEY
+      order: 2
+  - model_name: chat-free
+    litellm_params:
+      model: openrouter/meta-llama/llama-3.3-70b-instruct:free
+      api_key: os.environ/OPENROUTER_API_KEY
+      api_base: https://openrouter.ai/api/v1
+      order: 3
+
+router_settings:
+  num_retries: 2
+  timeout: 60
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
